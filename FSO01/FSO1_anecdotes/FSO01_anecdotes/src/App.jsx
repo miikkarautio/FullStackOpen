@@ -23,10 +23,12 @@ const App = () => {
     setPoints(newPoints) //Asetetaan nämä pisteet setPoints avulla oikeaan objectiin
   }
 
+
+  let highestValue = -Infinity 
+  let highestIndex = 0 
+
   const highestVote = () => {
 
-    let highestValue = -Infinity 
-    let highestIndex = 0 
 
     Object.entries(points).forEach(([index, value]) => {
       if (value > highestValue) {
@@ -55,7 +57,7 @@ const App = () => {
       <button onClick={() => {vote(); highestVote();}}>Vote</button>
       <h1>Aneccdote with the most votes</h1>
       <p>{anecdotes[highestVote()]}</p>
-      <p>With {points[selected]} votes</p>
+      <p>With {points[highestIndex]} votes</p>
     </>
   )
 }
