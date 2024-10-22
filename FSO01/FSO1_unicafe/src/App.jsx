@@ -6,7 +6,6 @@ const StatisticsLine = (props) => {
       <td>{props.text}:</td>
       <td>{props.value}</td>
     </tr>
-
   )
 }
 

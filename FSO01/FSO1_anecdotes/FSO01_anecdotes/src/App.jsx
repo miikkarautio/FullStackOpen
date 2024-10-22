@@ -13,14 +13,14 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
 
-  const [selected, setSelected] = useState(0)
+  const [selected, setSelected] = useState(0) 
 
-  const [points, setPoints] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 });
+  const [points, setPoints] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 })
 
   const vote = () => {
-    const newPoints = {...points} //Luodaan kopio tämän hetkisistä pisteistä.
-    newPoints[selected] +=1 //Nostetaan tämän hetkistä valittua anecdotia yhdellä
-    setPoints(newPoints) //Asetetaan nämä pisteet setPoints avulla oikeaan objectiin
+    const newPoints = {...points} 
+    newPoints[selected] += 1 
+    setPoints(newPoints) 
   }
 
 
@@ -28,8 +28,6 @@ const App = () => {
   let highestIndex = 0 
 
   const highestVote = () => {
-
-
     Object.entries(points).forEach(([index, value]) => {
       if (value > highestValue) {
         highestValue = value 
@@ -43,11 +41,9 @@ const App = () => {
   const randomAnecdote = () => {
     let random = Math.floor(Math.random() * 7) + 1
     setSelected(random)
-
   }
 
 
- 
   return (
     <>
       <h1>Anecdote of the day</h1>
