@@ -23,11 +23,21 @@
     {
       "id": "c7f3",
       "content": "adsf",
-      "important": false
+      "important": true
     },
     {
       "id": "6",
       "content": "asfd",
+      "important": true
+    },
+    {
+      "id": "7648",
+      "content": "asdf",
+      "important": false
+    },
+    {
+      "id": "fcef",
+      "content": "",
       "important": false
     }
   ]
