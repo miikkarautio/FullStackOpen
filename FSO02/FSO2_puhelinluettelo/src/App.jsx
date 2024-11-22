@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
 
 
@@ -31,7 +32,7 @@ const Persons = (props) => {
   return(
     <>
         {props.matchedPersons.map(person =>
-          <p key={person.name}>{person.name} {person.number} </p>
+          <p key={person.name}>{person.name} {person.number} <button onClick={() => props.handleDelete(person.id, person.name)}>Delete</button></p>
         )}
     </>
   )
@@ -39,23 +40,22 @@ const Persons = (props) => {
 
 const App = () => {
   const [persons, setPersons] = useState([])
-
   const [newNumber, setNewNumber] = useState('')
   const [newName, setNewName] = useState('')
   const [newSearch, setNewSearch] = useState('')
   const [matchedPersons, setMatchedPersons] = useState(persons)
 
-  //Fetch persons from db.json
+
+//Fetch persons from db.json
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-        setMatchedPersons(response.data)
+    personService
+      .getAll()
+      .then(persons => {
+        setPersons(persons)
+        setMatchedPersons(persons)
       })
   }, [])
+
   
   const checkDuplicates = () => {
     if(persons.some(person => person.name === newName)){
@@ -82,8 +82,13 @@ const App = () => {
       number: newNumber
     }
 
-    setPersons(persons.concat(personObject))
-    setMatchedPersons(persons.concat(personObject))
+    personService
+      .create(personObject)
+      .then(addedPerson => {
+        setPersons(persons.concat(addedPerson))
+        setMatchedPersons(persons.concat(addedPerson))
+      })
+
     setNewName('')
     setNewNumber('')
   }
@@ -111,6 +116,20 @@ const App = () => {
     addNewPerson();
   }
 
+  const handleDelete = (id, name) => {
+    if(window.confirm(`Do you really want to delete ${name}?`)){
+      axios
+      .delete(`http://localhost:3001/persons/${id}`)
+      .then(() => {
+        setMatchedPersons(persons.filter(person => person.id !== id));
+        setPersons(persons.filter(person => person.id !== id));
+      })
+    } else{
+      return
+    }
+
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -121,7 +140,7 @@ const App = () => {
       newNumber={newNumber} handleNumberChange={handleNumberChange}
       handleAddButton={handleAddButton}/>
       <h2>Numbers</h2>
-      <Persons matchedPersons={matchedPersons}/>
+      <Persons matchedPersons={matchedPersons} handleDelete={handleDelete}/>
     </div>
   )
 
