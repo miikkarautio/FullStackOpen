@@ -118,8 +118,8 @@ const App = () => {
 
   const handleDelete = (id, name) => {
     if(window.confirm(`Do you really want to delete ${name}?`)){
-      axios
-      .delete(`http://localhost:3001/persons/${id}`)
+      personService
+      .deletePerson(id)
       .then(() => {
         setMatchedPersons(persons.filter(person => person.id !== id));
         setPersons(persons.filter(person => person.id !== id));
@@ -127,8 +127,8 @@ const App = () => {
     } else{
       return
     }
-
   }
+
 
   return (
     <div>
