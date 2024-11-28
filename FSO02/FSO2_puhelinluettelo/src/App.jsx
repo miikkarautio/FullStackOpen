@@ -56,17 +56,13 @@ const App = () => {
       })
   }, [])
 
-  
   const checkDuplicates = () => {
     if(persons.some(person => person.name === newName)){
       alert(`${newName} is already added to phonebook`)
       console.log(persons)
       return true
-    } else if(!persons.some(person => person.name === newName)){
-      setPersons(persons.concat(newName))
-      console.log(`Henkilö ${newName} on lisätty`)
-      return false
-    }
+    } 
+    return false;
   }
 
   const addNewPerson = () => {
@@ -82,6 +78,7 @@ const App = () => {
       number: newNumber
     }
 
+
     personService
       .create(personObject)
       .then(addedPerson => {
@@ -95,7 +92,9 @@ const App = () => {
 
   const searchPerson = () => {
     setMatchedPersons(persons.filter(person => 
-      person.name.toLowerCase().includes(newSearch.toLowerCase())))
+      person.name.toLowerCase().includes(newSearch.toLowerCase()))
+    )
+    
   }
 
   const handleNameChange = (event) => {
@@ -113,7 +112,11 @@ const App = () => {
 
   const handleAddButton = (event) => {
     event.preventDefault();
-    addNewPerson();
+
+    if(checkNumber()){
+      return
+    } else addNewPerson()
+
   }
 
   const handleDelete = (id, name) => {
@@ -128,6 +131,24 @@ const App = () => {
       return
     }
   }
+
+  const checkNumber = () => {
+    const personNumberCheck = persons.find(
+      person => person.name.toLowerCase() === newName.toLowerCase() && person.number !== newNumber 
+    );
+    if(personNumberCheck){
+      const foundID = personNumberCheck.id
+      if(window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)){
+        const updatedPerson = {...personNumberCheck, number: newNumber}
+        axios
+        .put(`http://localhost:3001/persons/${foundID}`, updatedPerson)
+        .then(console.log(`Updated person with ${newName} with a new number ${newNumber}`))
+      }
+      return true
+    } 
+    return false
+  }
+
 
 
   return (
