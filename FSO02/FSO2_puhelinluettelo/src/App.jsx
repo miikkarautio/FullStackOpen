@@ -142,7 +142,17 @@ const App = () => {
         const updatedPerson = {...personNumberCheck, number: newNumber}
         axios
         .put(`http://localhost:3001/persons/${foundID}`, updatedPerson)
-        .then(console.log(`Updated person with ${newName} with a new number ${newNumber}`))
+        .then(response => {
+          setPersons(persons.map(person => 
+            person.id !== foundID ? person : response.data
+          )); //Korvataan persons listaus samoilla arvoilla
+              //paitsi jos ID on sama mikä response.data:lla
+          setMatchedPersons(matchedPersons.map(person => 
+            person.id !== foundID ? person : response.data
+          ));
+          setNewName('')
+          setNewNumber('')
+        })
       }
       return true
     } 
