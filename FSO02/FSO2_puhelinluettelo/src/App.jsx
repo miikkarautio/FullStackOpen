@@ -132,6 +132,7 @@ const App = () => {
     }
   }
 
+
   const checkNumber = () => {
     const personNumberCheck = persons.find(
       person => person.name.toLowerCase() === newName.toLowerCase() && person.number !== newNumber 
@@ -140,25 +141,23 @@ const App = () => {
       const foundID = personNumberCheck.id
       if(window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)){
         const updatedPerson = {...personNumberCheck, number: newNumber}
-        axios
-        .put(`http://localhost:3001/persons/${foundID}`, updatedPerson)
-        .then(response => {
-          setPersons(persons.map(person => 
-            person.id !== foundID ? person : response.data
-          )); //Korvataan persons listaus samoilla arvoilla
-              //paitsi jos ID on sama mikä response.data:lla
-          setMatchedPersons(matchedPersons.map(person => 
-            person.id !== foundID ? person : response.data
+        personService
+        .updatePerson(foundID, updatedPerson)
+        .then((updatedPersonFromServer) => { //<- asetetaan person.js response.data "updatedPersonFromServer"
+          setPersons(persons.map(person =>
+            person.id === foundID ? updatedPersonFromServer : person
           ));
-          setNewName('')
-          setNewNumber('')
+          setMatchedPersons(persons.map(person => 
+            person.id === foundID ? updatedPersonFromServer : person
+          ));
+          setNewName('');
+          setNewNumber('');
         })
       }
       return true
     } 
     return false
   }
-
 
 
   return (
