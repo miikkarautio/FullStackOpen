@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
-import Note from './components/Note'
 import noteService from './services/notes'
+
 
 
 const App = (props) => {
@@ -56,7 +55,7 @@ const App = (props) => {
     ? 'make not important' : 'make important'
 
     return(
-      <li>
+      <li className="note">
         {note.content}
         <button onClick={toggleImportance}>{label}</button>
       </li>

@@ -28,6 +28,20 @@ const PersonForm = (props) => {
   )
 }
 
+const Notification = ({ message }) => {
+  if(message === null) {
+    return  
+  }
+
+  return (
+    <div className={'change'}>
+      {message}
+    </div>
+  )
+
+}
+
+
 const Persons = (props) => {
   return(
     <>
@@ -44,6 +58,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newSearch, setNewSearch] = useState('')
   const [matchedPersons, setMatchedPersons] = useState(persons)
+  const [message, setMessage] = useState(null)
 
 
 //Fetch persons from db.json
@@ -78,12 +93,15 @@ const App = () => {
       number: newNumber
     }
 
-
     personService
       .create(personObject)
       .then(addedPerson => {
         setPersons(persons.concat(addedPerson))
         setMatchedPersons(persons.concat(addedPerson))
+        setMessage(`Added ${addedPerson.name}`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
       })
 
     setNewName('')
@@ -126,6 +144,10 @@ const App = () => {
       .then(() => {
         setMatchedPersons(persons.filter(person => person.id !== id));
         setPersons(persons.filter(person => person.id !== id));
+        setMessage(`Deleted ${name}`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
       })
     } else{
       return
@@ -150,6 +172,10 @@ const App = () => {
           setMatchedPersons(persons.map(person => 
             person.id === foundID ? updatedPersonFromServer : person
           ));
+          setMessage(`Number changed for person ${updatedPersonFromServer.name}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
           setNewName('');
           setNewNumber('');
         })
@@ -163,6 +189,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message}/>
       <Filter newSearch={newSearch} handleSearch={handleSearch}/>
       <h2>Add a new</h2>
       <PersonForm
