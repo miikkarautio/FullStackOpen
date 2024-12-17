@@ -28,18 +28,20 @@ const PersonForm = (props) => {
   )
 }
 
-const Notification = ({ message }) => {
+const Notification = ({ message, style }) => {
   if(message === null) {
     return  
   }
 
   return (
-    <div className={'change'}>
+    <div style={style} className={'change'}>
       {message}
     </div>
   )
 
 }
+
+
 
 
 const Persons = (props) => {
@@ -59,6 +61,7 @@ const App = () => {
   const [newSearch, setNewSearch] = useState('')
   const [matchedPersons, setMatchedPersons] = useState(persons)
   const [message, setMessage] = useState(null)
+  const [messageStyle, setMessageStyle] = useState(null)
 
 
 //Fetch persons from db.json
@@ -98,8 +101,10 @@ const App = () => {
       .then(addedPerson => {
         setPersons(persons.concat(addedPerson))
         setMatchedPersons(persons.concat(addedPerson))
+        setMessageStyle({color: 'green'})
         setMessage(`Added ${addedPerson.name}`)
         setTimeout(() => {
+          setMessageStyle(null)
           setMessage(null)
         }, 5000)
       })
@@ -144,8 +149,10 @@ const App = () => {
       .then(() => {
         setMatchedPersons(persons.filter(person => person.id !== id));
         setPersons(persons.filter(person => person.id !== id));
+        setMessageStyle({color: 'green'})
         setMessage(`Deleted ${name}`)
         setTimeout(() => {
+          setMessageStyle(null)
           setMessage(null)
         }, 5000)
       })
@@ -172,12 +179,22 @@ const App = () => {
           setMatchedPersons(persons.map(person => 
             person.id === foundID ? updatedPersonFromServer : person
           ));
+          setMessageStyle({color: 'green'})
           setMessage(`Number changed for person ${updatedPersonFromServer.name}`)
           setTimeout(() => {
             setMessage(null)
+            setMessageStyle(null)
           }, 5000)
           setNewName('');
           setNewNumber('');
+        })
+        .catch(error => {
+          setMessageStyle({color: 'red'})
+          setMessage(`Information of ${newName} has already been removed from server`)
+          setTimeout(() => {
+            setMessage(null)
+            setMessageStyle(null)
+          }, 5000)
         })
       }
       return true
@@ -189,7 +206,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message}/>
+      <Notification style={messageStyle} message={message}/>
       <Filter newSearch={newSearch} handleSearch={handleSearch}/>
       <h2>Add a new</h2>
       <PersonForm
