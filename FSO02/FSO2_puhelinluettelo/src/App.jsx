@@ -43,7 +43,6 @@ const Notification = ({ message, style }) => {
 
 
 
-
 const Persons = (props) => {
   return(
     <>
@@ -217,6 +216,7 @@ const App = () => {
       <Persons matchedPersons={matchedPersons} handleDelete={handleDelete}/>
     </div>
   )
+
 
 }
 
