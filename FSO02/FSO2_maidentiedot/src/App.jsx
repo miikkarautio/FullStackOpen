@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react'
 import axios from 'axios';
 
 const CountryInformation = (props) => {
-
-
   return(
     <>
       {props.countryInfo.map((information) =>
-        <p key={information.cca3}>
+        <div key={information.cca3}>
           <h1>{information.name.common}</h1>
-          Capital: {information.capital} <br/>
-          Area: {information.area} <br/>
+          <p>Capital: {information.capital}</p> 
+          <p>Area: {information.area}</p> 
           <h2>Languages</h2>
           <ul>
             {Object.values(information.languages).map((language, index) =>(
@@ -18,10 +16,22 @@ const CountryInformation = (props) => {
             ))}
           </ul>
           <img src={information.flags.png} alt="Image of the countries flag" />
-          </p> 
+          </div> 
           
       )}
       
+    </>
+  )
+}
+
+const CountrySearch = (props) => {
+  return(
+    <>
+      <p>Find countries <input type="text" id="country" onChange={props.findCountry} /></p>
+      {props.errorMessage && <p>{props.errorMessage}</p>}
+      {props.foundCountries.map((country) =>
+        <p key={country.cca3}>{country.name.common} <button onClick={() => props.setActiveCountry(country)}>Show</button></p>
+      )}
     </>
   )
 }
@@ -31,6 +41,7 @@ function App() {
   const [foundCountries, setFoundCountries] = useState([])
   const [errorMessage, setErrorMessage] = useState("")
   const [countryInfo, setCountryInfo] = useState([])
+
 
   useEffect(() => {
     axios
@@ -64,16 +75,24 @@ function App() {
       setCountryInfo([])
     }
 
-    console.log(foundCountries)
   }
+
+  const setActiveCountry = (selectedCountry) => {
+    setCountryInfo([selectedCountry])
+    if(selectedCountry){
+      setFoundCountries([])
+    }
+  }
+  
 
   return (
     <>
-      <p>Find countries <input type="text" id="country" onChange={findCountry} /></p>
-      {errorMessage && <p>{errorMessage}</p>}
-      {foundCountries.map((country) =>
-        <p key={country.cca3}>{country.name.common}</p>
-      )}
+      <CountrySearch
+      findCountry={findCountry}
+      errorMessage={errorMessage}
+      foundCountries={foundCountries}
+      setActiveCountry={setActiveCountry}
+      />
       <CountryInformation countryInfo={countryInfo} />
     </>
   )
