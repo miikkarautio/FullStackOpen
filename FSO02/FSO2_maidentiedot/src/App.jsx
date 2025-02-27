@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios';
+import countryService from './services/countries'
+import weatherService from './services/weather'
 
 const CountryInformation = (props) => {
   return(
@@ -41,10 +43,17 @@ const CountrySearch = (props) => {
 }
 
 const WeatherData = (props) => {
+  if (Object.keys(props.weatherData).length === 0) {
+    return null;
+  }
+
   return(
     <>
       <div>
         <h1>Weather in {props.weatherData.name}</h1>
+        <p>Temperature {props.weatherData.main.temp}</p>
+        <img src={`https://openweathermap.org/img/wn/${props.weatherData.weather[0].icon}@2x.png`}/>
+        <p>Wind {props.weatherData.wind.speed} m/s</p>
       </div>
     </>
   )
@@ -62,24 +71,20 @@ function App() {
 
 
   useEffect(() => {
-    axios
-      .get('https://studies.cs.helsinki.fi/restcountries/api/all')
+    countryService
+      .getAll()
       .then(response => {setCountry(response.data)})
-  }, []);
-
-  useEffect(() => {
-    if (latitude && longitude) {
-      console.log("Latitude:", latitude,  "longitude:", longitude);
-    }
-  }, [latitude, longitude]);
+  })
 
   useEffect(() => {
     if(latitude && longitude){
-      axios
-      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid={API-KEY}`)
-      .then(response => (console.log(response.data)))
+      weatherService
+        .getAll(latitude, longitude)
+        .then(response =>{
+          setWeatherData(response.data)
+        })
     }
-  }, [longitude, latitude]);
+  }, [longitude, latitude])
 
 
   const findCountry = (e) => {
@@ -92,9 +97,12 @@ function App() {
     if (e.target.value.trim() === "") {
       setErrorMessage(" ");
       setFoundCountries([]);
+      setWeatherData([])
     } else if (found.length > 10) {
       setErrorMessage("Too many matches, specify another filter");
       setFoundCountries([]);
+      setWeatherData([])
+
     } else {
       setErrorMessage("");
       setFoundCountries(found);
@@ -103,24 +111,57 @@ function App() {
 
     if(found.length === 1){
       setCountryInfo(found)
+      setLatitude(found[0].latlng[0])
+      setLongitude(found[0].latlng[1])
       setFoundCountries([])
+
+      setWeatherData([]);
+
+      axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${found[0].latlng[0]}&lon=${found[0].latlng[1]}&appid=${"API_KEY"}&units=metric`)
+      .then(response => {
+        setWeatherData(response.data)
+      })
+      .catch(error => {
+        console.log("Error fetching weather data:", error);
+        setWeatherData([])
+      });
+
     } else{
       setCountryInfo([])
+      setWeatherData([]);
     }
 
 
   }
 
   const setActiveCountry = (selectedCountry) => {
-    setCountryInfo([selectedCountry])
+    
+    setCountryInfo([selectedCountry]);
+
+    setWeatherData([]);
+
     setLatitude(selectedCountry.latlng[0]);
     setLongitude(selectedCountry.latlng[1]); 
+
     if(selectedCountry){
       setFoundCountries([])
     }
+
+    if(selectedCountry){
+      axios
+        .get(`https://api.openweathermap.org/data/2.5/weather?lat=${selectedCountry.latlng[0]}&lon=${selectedCountry.latlng[1]}&appid=${"API_KEY"}&units=metric`)
+        .then(response => {
+          setWeatherData(response.data)
+        })
+        .catch(error => {
+          console.log("Error fetching weather data:", error);
+          setWeatherData([])
+        });
+    }
+
   }
   
-
   return (
     <>
       <CountrySearch
@@ -132,9 +173,9 @@ function App() {
       setLongitude={setLongitude}
       />
       <CountryInformation countryInfo={countryInfo}/>
-      <WeatherData weatherData={weatherData.name}/>
+      <WeatherData weatherData={weatherData}/>
     </>
   )
 }
 
-export default App
+  export default App
