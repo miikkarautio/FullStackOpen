@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios';
 import countryService from './services/countries'
 import weatherService from './services/weather'
+
+
 
 const CountryInformation = (props) => {
   return(
@@ -19,7 +20,6 @@ const CountryInformation = (props) => {
           </ul>
           <img src={information.flags.png} alt="Image of the countries flag" />
           </div> 
-          
       )}
       
     </>
@@ -46,7 +46,6 @@ const WeatherData = (props) => {
   if (Object.keys(props.weatherData).length === 0) {
     return null;
   }
-
   return(
     <>
       <div>
@@ -74,7 +73,7 @@ function App() {
     countryService
       .getAll()
       .then(response => {setCountry(response.data)})
-  })
+  },[])
 
   useEffect(() => {
     if(latitude && longitude){
@@ -85,7 +84,6 @@ function App() {
         })
     }
   }, [longitude, latitude])
-
 
   const findCountry = (e) => {
     const foundCountry = e.target.value.trim().toLowerCase();
@@ -111,21 +109,17 @@ function App() {
 
     if(found.length === 1){
       setCountryInfo(found)
-      setLatitude(found[0].latlng[0])
-      setLongitude(found[0].latlng[1])
       setFoundCountries([])
 
       setWeatherData([]);
 
-      axios
-      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${found[0].latlng[0]}&lon=${found[0].latlng[1]}&appid=${"API_KEY"}&units=metric`)
-      .then(response => {
-        setWeatherData(response.data)
-      })
-      .catch(error => {
-        console.log("Error fetching weather data:", error);
-        setWeatherData([])
-      });
+      weatherService
+        .getAll(found[0].latlng[0], found[0].latlng[1])
+        .then(response => {
+          setWeatherData(response.data)
+        }).catch(error => {
+          console.log("Error fetching weather data in findCountry:", error)
+        })
 
     } else{
       setCountryInfo([])
@@ -141,23 +135,19 @@ function App() {
 
     setWeatherData([]);
 
-    setLatitude(selectedCountry.latlng[0]);
-    setLongitude(selectedCountry.latlng[1]); 
-
     if(selectedCountry){
       setFoundCountries([])
     }
 
     if(selectedCountry){
-      axios
-        .get(`https://api.openweathermap.org/data/2.5/weather?lat=${selectedCountry.latlng[0]}&lon=${selectedCountry.latlng[1]}&appid=${"API_KEY"}&units=metric`)
+      weatherService
+        .getAll(selectedCountry.latlng[0], selectedCountry.latlng[1])
         .then(response => {
           setWeatherData(response.data)
         })
         .catch(error => {
-          console.log("Error fetching weather data:", error);
-          setWeatherData([])
-        });
+          console.log("Error fetching weather data in setActiveCountry:", error)
+        })
     }
 
   }
