@@ -25,3 +25,10 @@ dist-ssr
 *.sw?
 db.json
 notes-frontend.code-workspace
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
